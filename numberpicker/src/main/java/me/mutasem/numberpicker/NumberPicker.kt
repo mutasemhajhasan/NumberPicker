@@ -10,6 +10,7 @@ import android.widget.ImageButton
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import java.math.BigDecimal
 
 
 class NumberPicker : RelativeLayout {
@@ -19,10 +20,10 @@ class NumberPicker : RelativeLayout {
 
 
     lateinit var numberTxt: TextView
-    var minValue = 0
-
+    var minValue: BigDecimal = BigDecimal.ZERO
+    var currentStep = BigDecimal.ONE
     var changeListener: ChangeListener? = null
-    var currentValue = 0
+    var currentValue = BigDecimal.ZERO
 
     constructor(context: Context?) : super(context) {
         vInit(context, null, 0, 0)
@@ -58,9 +59,9 @@ class NumberPicker : RelativeLayout {
     ) {
 
         View.inflate(context, R.layout.number_picker, this)
-        increase = findViewById<ImageButton>(R.id.increase)
-        decrease = findViewById<ImageButton>(R.id.decrease)
-        numberTxt = findViewById<EditText>(R.id.numberText)
+        increase = findViewById(R.id.increase)
+        decrease = findViewById(R.id.decrease)
+        numberTxt = findViewById(R.id.numberText)
         increase.setOnClickListener { increaseClick() }
         decrease.setOnClickListener { decreaseClick() }
         if (attrs != null) {
@@ -71,11 +72,20 @@ class NumberPicker : RelativeLayout {
                 defStyleRes
             )
             try {
-                minValue = a?.getInt(R.styleable.NumberPicker_minValue, 0)!!
-                currentValue = a.getInt(R.styleable.NumberPicker_value, 0)
-                if (currentValue < minValue)
+                if (a != null) {
+                    val mv = a?.getString(R.styleable.NumberPicker_minValue)
+                    if (mv != null && mv.isNotEmpty())
+                        minValue = BigDecimal(mv)
+                    val cs = a?.getString(R.styleable.NumberPicker_step)
+                    if (cs != null && cs.isNotEmpty())
+                        currentStep = BigDecimal(cs)
+                    val cv = a?.getString(R.styleable.NumberPicker_value)
+                    if (cv != null && cv.isNotEmpty())
+                        currentValue = BigDecimal(cv)
+                }
+                if (minValue > currentValue)
                     currentValue = minValue
-                numberTxt.setText("$currentValue")
+                numberTxt.setText("${currentValue.toString()}")
             } catch (e: Exception) {
                 Log.e(TAG, "error", e)
             } finally {
@@ -85,31 +95,43 @@ class NumberPicker : RelativeLayout {
     }
 
     private fun increaseClick() {
-        currentValue += 1
+        currentValue = currentValue.add(currentStep)
         numberTxt.setText("$currentValue")
         changeListener?.onIncrease(currentValue)
+    }
+
+    fun setStep(step: BigDecimal) {
+        currentStep = step
+    }
+
+    fun getStep(): BigDecimal {
+        return currentStep
     }
 
     private fun decreaseClick() {
         if (currentValue <= minValue)
             return
-        currentValue--
+        currentValue = currentValue.minus(currentStep)
         numberTxt.setText("$currentValue")
         changeListener?.onDecrease(currentValue)
     }
 
 
-    fun setValue(value: Int) {
+    fun setValue(value: BigDecimal) {
         this.currentValue = value
         numberTxt.setText("$value")
     }
 
-    fun getValue(): Int {
+    fun getValue(): BigDecimal {
         return currentValue
     }
 
     interface ChangeListener {
-        fun onIncrease(newValue: Int)
-        fun onDecrease(newValue: Int)
+        fun onIncrease(newValue: BigDecimal)
+        fun onDecrease(newValue: BigDecimal)
+    }
+
+    fun setEditable(b: Boolean) {
+        numberTxt.isEnabled = b
     }
 }

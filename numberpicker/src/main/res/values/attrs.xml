@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="NumberPicker">
-        <attr name="minValue" format="integer" />
-        <attr name="value" format="integer" />
+        <attr name="minValue" format="string" />
+        <attr name="value" format="string" />
+        <attr name="step" format="string" />
         <attr name="drawableColor" format="color" />
     </declare-styleable>
 </resources>

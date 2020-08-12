@@ -9,18 +9,17 @@
     tools:context=".MainActivity">
 
     <me.mutasem.numberpicker.NumberPicker
-        android:layout_width="200dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="Hello World!"
-        app:minValue="1"
+        app:minValue="1.0"
+        app:step="0.2"
         app:value="0" />
 
     <me.mutasem.numberpicker.NumberPicker
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="Hello World!"
         app:minValue="1"
         app:value="1" />
 
